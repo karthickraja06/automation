@@ -1,0 +1,25 @@
+name: Daily Automation
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Runs daily at 6 AM UTC (Change as needed)
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Script
+        run: python automation.py

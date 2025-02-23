@@ -21,5 +21,12 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
+      - name: Set Up Environment Variables
+        run: |
+          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
+          echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
+          echo "SERVICE_FILE=${{ secrets.SERVICE_FILE }}" >> $GITHUB_ENV
+          echo "TTS_SERVICE_FILE=${{ secrets.TTS_SERVICE_FILE }}" >> $GITHUB_ENV
+
       - name: Run Script
         run: python automation.py

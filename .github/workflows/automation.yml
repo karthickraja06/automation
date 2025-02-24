@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
           echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
-          
+
       - name: Decode and Store Service Account Files
         run: |
           mkdir -p secrets
@@ -33,7 +33,23 @@ jobs:
           echo '${{ secrets.TTS_SERVICE_FILE }}' | base64 --decode > secrets/TTS_SERVICE_FILE.json
           echo "SERVICE_FILE_PATH=secrets/SERVICE_FILE.json" >> $GITHUB_ENV
           echo "TTS_SERVICE_FILE_PATH=secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
-        
+
+      # ✅ Debug Step 1: Check if the secrets directory and files exist
+      - name: Verify Decoded Files Exist
+        run: ls -l secrets/
+
+      # ✅ Debug Step 2: Print a few lines of the decoded JSON files (ensure they are not empty)
+      - name: Print Service Account File (First 10 Lines)
+        run: head -n 10 secrets/SERVICE_FILE.json
+
+      # ✅ Debug Step 3: Ensure environment variables are correctly set
+      - name: Check Environment Variables
+        run: env | grep 'SHEET_ID\|SERVICE_FILE\|TTS_SERVICE_FILE'
+
+      # ✅ Debug Step 4: Check if SERVICE_FILE_PATH is correctly referenced in Python
+      - name: Verify Python ENV Variables
+        run: |
+          python -c "import os; print(f'SERVICE_FILE_PATH={os.getenv("SERVICE_FILE_PATH")}')"
 
       - name: Run Script
         run: python automation.py

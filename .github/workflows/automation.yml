@@ -40,7 +40,7 @@ jobs:
 
       # ✅ Debug Step 2: Print a few lines of the decoded JSON files (ensure they are not empty)
       - name: Print Service Account File (First 10 Lines)
-        run: head -n 10 secrets/SERVICE_FILE.json
+        run: head -n 5 secrets/SERVICE_FILE.json
 
       # ✅ Debug Step 3: Ensure environment variables are correctly set
       - name: Check Environment Variables
@@ -52,7 +52,10 @@ jobs:
           python -c "import os; print(f'SERVICE_FILE_PATH={os.getenv("SERVICE_FILE_PATH")}')"
 
       - name: Run Script
-        run: python automation.py
+        run: |
+          export SERVICE_FILE_PATH=secrets/SERVICE_FILE.json
+          export TTS_SERVICE_FILE_PATH=secrets/TTS_SERVICE_FILE.json
+          python automation.py
       
       - name: Cleanup Secrets
         run: rm -rf secrets

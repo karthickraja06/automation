@@ -25,9 +25,19 @@ jobs:
         run: |
           echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
           echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
-          echo "SERVICE_FILE=$(echo '${{ secrets.SERVICE_FILE }}' | base64 --decode)" >> $GITHUB_ENV
-          echo "SERVICE_FILE=$(echo '${{ secrets.TTS_SERVICE_FILE }}' | base64 --decode)" >> $GITHUB_ENV
-
+          
+      - name: Decode and Store Service Account Files
+        run: |
+          mkdir -p secrets
+          echo '${{ secrets.SERVICE_FILE }}' | base64 --decode > secrets/SERVICE_FILE.json
+          echo '${{ secrets.TTS_SERVICE_FILE }}' | base64 --decode > secrets/TTS_SERVICE_FILE.json
+          echo "SERVICE_FILE_PATH=secrets/SERVICE_FILE.json" >> $GITHUB_ENV
+          echo "TTS_SERVICE_FILE_PATH=secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
+        
 
       - name: Run Script
         run: python automation.py
+      
+      - name: Cleanup Secrets
+        run: rm -rf secrets
+      

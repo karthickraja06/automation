@@ -19,28 +19,18 @@ VALUE_INPUT_OPTION = "RAW"
 
 # Google Sheets API Authentication
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_FILE")  # Get the actual path from env
 
-creds = None
-if SERVICE_ACCOUNT_FILE and os.path.exists(SERVICE_ACCOUNT_FILE):  # Running locally
-    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-else:  # Running in GitHub Actions (from secrets)
-    creds = Credentials.from_service_account_info(
-        {
-            "type": "service_account",
-            "project_id": os.getenv("GCP_PROJECT_ID"),
-            "private_key_id": os.getenv("PRIVATE_KEY_ID"),
-            "private_key": os.getenv("PRIVATE_KEY", "").replace("\\n", "\n"),
-            "client_email": os.getenv("CLIENT_EMAIL"),
-            "client_id": os.getenv("CLIENT_ID"),
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_x509_cert_url": os.getenv("CLIENT_CERT_URL"),
-        },
-        scopes=SCOPES,
-    )
+# Get the actual service account file path
+SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
 
+# Ensure the file exists before using it
+if not os.path.exists(SERVICE_ACCOUNT_FILE):
+    raise FileNotFoundError(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
+
+# Authenticate using the file
+creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+# Authorize with gspread and Google Sheets API
 gc = gspread.authorize(creds)
 service = build("sheets", "v4", credentials=creds)
 

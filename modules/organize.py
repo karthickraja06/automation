@@ -10,13 +10,17 @@ SHEET3_NAME = "response"
 
 # Authenticate with Google Sheets API
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file("service_file.json", scopes=SCOPES)
+service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
+
+if not service_file_path or not os.path.exists(service_file_path):
+        raise ValueError("Missing or invalid SERVICE_FILE_PATH")
+
+creds = Credentials.from_service_account_file(service_file_path, scopes=SCOPES)
 gc = gspread.authorize(creds)
 
 def update_google_sheets():
     # Step 1: Generate script data
     json_response = script_generation()
-    print(type(json_response))
     description = json_response[0].get("video_description", "")
     script_data = json_response[0].get("script", [])
     
@@ -35,8 +39,6 @@ def update_google_sheets():
         if row[last_used_col_index].lower() == "this":
             sheet1.update_cell(i, description_col_index + 1, description)
             break
-    
-    # Step 3: Clear all data from Sheet3 (keeping the header row intact)
 
     # Get only the first row (header)
     sheet3_header = sheet3.row_values(1)

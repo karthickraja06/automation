@@ -14,35 +14,22 @@ def generate_speech():
     SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
     TTS_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
-    # Function to create credentials from JSON file or environment variables
-    def get_credentials(service_file_env, scopes):
-        service_file = os.getenv(service_file_env)  # Fetch file path from .env
+    # Get service file paths from environment variables
+    service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")  # This now contains the actual file path
+    tts_service_file_path = os.getenv("TTS_SERVICE_FILE_PATH", "secrets/TTS_SERVICE_FILE.json")
 
-        if service_file and os.path.exists(service_file):  # If JSON file exists, use it
-            return Credentials.from_service_account_file(service_file, scopes=scopes)
-        else:  # If no file, use environment variables
-            return Credentials.from_service_account_info(
-                {
-                    "type": "service_account",
-                    "project_id": os.getenv("GCP_PROJECT_ID"),
-                    "private_key_id": os.getenv("PRIVATE_KEY_ID"),
-                    "private_key": os.getenv("PRIVATE_KEY", "").replace("\\n", "\n"),
-                    "client_email": os.getenv("CLIENT_EMAIL"),
-                    "client_id": os.getenv("CLIENT_ID"),
-                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "client_x509_cert_url": os.getenv("CLIENT_CERT_URL"),
-                },
-                scopes=scopes,
-            )
+    if not service_file_path or not os.path.exists(service_file_path):
+        raise ValueError("Missing or invalid SERVICE_FILE_PATH")
+
+    if not tts_service_file_path or not os.path.exists(tts_service_file_path):
+        raise ValueError("Missing or invalid TTS_SERVICE_FILE_PATH")
 
     # Authenticate Google Sheets
-    sheets_creds = get_credentials("SERVICE_FILE", SHEETS_SCOPES)
+    sheets_creds = Credentials.from_service_account_file(service_file_path, scopes=SHEETS_SCOPES)
     sheets_client = gspread.authorize(sheets_creds)
 
     # Authenticate Google Text-to-Speech
-    tts_creds = get_credentials("TTS_SERVICE_FILE", TTS_SCOPES)
+    tts_creds = Credentials.from_service_account_file(tts_service_file_path, scopes=TTS_SCOPES)
     tts_client = texttospeech.TextToSpeechClient(credentials=tts_creds)
 
 

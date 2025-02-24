@@ -25,8 +25,9 @@ jobs:
         run: |
           echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
           echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
-          echo "SERVICE_FILE=${{ secrets.SERVICE_FILE }}" >> $GITHUB_ENV
-          echo "TTS_SERVICE_FILE=${{ secrets.TTS_SERVICE_FILE }}" >> $GITHUB_ENV
+          echo "SERVICE_FILE=$(echo '${{ secrets.SERVICE_FILE }}' | base64 --decode)" >> $GITHUB_ENV
+          echo "SERVICE_FILE=$(echo '${{ secrets.TTS_SERVICE_FILE }}' | base64 --decode)" >> $GITHUB_ENV
+
 
       - name: Run Script
         run: python automation.py

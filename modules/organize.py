@@ -23,7 +23,7 @@ def update_google_sheets():
     json_response = script_generation()
     description = json_response[0].get("video_description", "")
     script_data = json_response[0].get("script", [])
-    
+        
     # Open the spreadsheet
     sh = gc.open_by_key(SPREADSHEET_ID)
     sheet1 = sh.worksheet(SHEET1_NAME)

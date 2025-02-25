@@ -3,6 +3,7 @@ import google.generativeai as genai
 import json
 from dotenv import load_dotenv
 from modules.prompt import sync_google_sheets_data  # Import the function
+from modules.image_generation import image_generation
 
 def script_generation():
     
@@ -38,6 +39,7 @@ def script_generation():
     # Parse JSON response
     try:
         script_json = json.loads(response.text)  # Convert response to JSON
+        image_generation(script_json[0].get("script", []))
         return(script_json)  # Print JSON output
     except json.JSONDecodeError as e:
         print("Error parsing JSON:", str(e))

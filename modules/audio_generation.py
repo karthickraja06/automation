@@ -3,7 +3,6 @@ import gspread
 from google.oauth2.service_account import Credentials
 from google.cloud import texttospeech
 from dotenv import load_dotenv
-import shutil
 from datetime import datetime
 
 def audio_generation():

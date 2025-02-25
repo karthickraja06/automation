@@ -27,11 +27,11 @@ jobs:
           echo "${{ secrets.SERVICE_FILE }}" | base64 --decode > secrets/SERVICE_FILE.json
           echo "${{ secrets.TTS_SERVICE_FILE }}" | base64 --decode > secrets/TTS_SERVICE_FILE.json
           
-          # Export variables to make them available in the same shell session
-          echo "export SERVICE_FILE_PATH=$(pwd)/secrets/SERVICE_FILE.json" >> ~/.bashrc
-          echo "export TTS_SERVICE_FILE_PATH=$(pwd)/secrets/TTS_SERVICE_FILE.json" >> ~/.bashrc
-          echo "export SHEET_ID=${{ secrets.SHEET_ID }}" >> ~/.bashrc
-          echo "export GEMINI_API=${{ secrets.GEMINI_API }}" >> ~/.bashrc
+          # ✅ Properly append environment variables to GITHUB_ENV
+          echo "SERVICE_FILE_PATH=$(pwd)/secrets/SERVICE_FILE.json" >> $GITHUB_ENV
+          echo "TTS_SERVICE_FILE_PATH=$(pwd)/secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
+          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
+          echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
 
       - name: Verify Decoded Files Exist
         run: ls -l secrets/
@@ -40,13 +40,10 @@ jobs:
         run: head -n 5 secrets/SERVICE_FILE.json
 
       - name: Verify Environment Variables
-        run: source ~/.bashrc && env | grep 'SERVICE_FILE_PATH\|SHEET_ID\|GEMINI_API'
+        run: env | grep 'SERVICE_FILE_PATH\|SHEET_ID\|GEMINI_API'
 
       - name: Run Script
-        run: |
-          source ~/.bashrc
-          python -c "import os; print(f'SERVICE_FILE_PATH={os.getenv('SERVICE_FILE_PATH')}')"
-          python automation.py
+        run: python automation.py
 
       - name: Cleanup Secrets
         run: rm -rf secrets

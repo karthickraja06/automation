@@ -1,3 +1,4 @@
+python-dotenv
 gemini-api # Free AI model for script generation
 #selenium   # Web scraping (trending topics)
 #beautifulsoup4  # Competitor analysis

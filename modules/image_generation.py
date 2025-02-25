@@ -42,7 +42,7 @@ def image_prompt_generation(input_script):
 def image_generation(json_data):
     if not isinstance(json_data, dict):
         raise ValueError("Invalid input JSON. Expected a dictionary.")
-
+    print(json_data)    # Debugging purposes
     input_script = json.dumps(json_data) + """
     Generate the response in only JSON output like:
     ```json
@@ -52,7 +52,7 @@ def image_generation(json_data):
     Provide me with at least 4 text prompts to generate images related to the script.
     The pictures should be super vivid, colorful, 3D, and hyper-realistic.
     """
-
+    print(input_script) # Debugging purposes
     response = image_prompt_generation(input_script)
 
     if not response or not isinstance(response, dict):

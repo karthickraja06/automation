@@ -39,6 +39,7 @@ def script_generation():
     # Parse JSON response
     try:
         script_json = json.loads(response.text)  # Convert response to JSON
+        print(script_json)  # Debugging purposes
         image_generation(script_json[0].get("script", []))
         return(script_json)  # Print JSON output
     except json.JSONDecodeError as e:

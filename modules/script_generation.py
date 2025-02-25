@@ -6,7 +6,7 @@ from modules.prompt import sync_google_sheets_data  # Import the function
 def script_generation():
 
     # Load Gemini AI API Key from environment variables
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GEMINI_API_KEY = os.getenv("GEMINI_API")
 
     if not GEMINI_API_KEY:
         raise ValueError("Missing Gemini API Key. Set GEMINI_API_KEY in environment variables.")

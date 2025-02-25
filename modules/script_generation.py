@@ -1,10 +1,12 @@
 import os
 import google.generativeai as genai
 import json
+from dotenv import load_dotenv
 from modules.prompt import sync_google_sheets_data  # Import the function
 
 def script_generation():
-
+    
+    load_dotenv()
     # Load Gemini AI API Key from environment variables
     GEMINI_API_KEY = os.getenv("GEMINI_API")
 

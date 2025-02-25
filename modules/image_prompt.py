@@ -7,7 +7,26 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+service_file_path = os.getenv("SERVICE_FILE", "secrets/SERVICE_FILE.json")
+SPREADSHEET_ID = os.getenv("SHEET_ID")
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+if not service_file_path or not os.path.exists(service_file_path):
+    raise ValueError("Missing or invalid SERVICE_FILE_PATH")
+
+creds = Credentials.from_service_account_file(service_file_path, scopes=SCOPES)
+gc = gspread.authorize(creds)
+sh = gc.open_by_key(SPREADSHEET_ID)
+
+
+def fetch_sheet_data(sheet_name):
+    """Fetches all rows from a Google Sheet."""
+    sheet = sh.worksheet(sheet_name)
+    return sheet.get_all_values()  # Returns a list of lists (each row as a list)
+
 def image_prompt_generation(input_script):
+    """Generates image prompts using Gemini AI."""
     GEMINI_API_KEY = os.getenv("GEMINI_API")
     if not GEMINI_API_KEY:
         raise ValueError("Missing Gemini API Key. Set GEMINI_API_KEY in environment variables.")
@@ -39,42 +58,42 @@ def image_prompt_generation(input_script):
     finally:
         del model  # Delete model instance
 
-def image_generation(json_data):
-    if not isinstance(json_data, dict):
-        raise ValueError("Invalid input JSON. Expected a dictionary.")
-    print(json_data)    # Debugging purposes
-    input_script = json.dumps(json_data) + """
+def image_prompt_generation():
+    """Fetches script from Sheet3, generates image prompts, and stores them in Sheet4."""
+    sheet3_data = fetch_sheet_data("response")  # Fetch data from 'response' sheet
+
+    # Convert sheet data (list of lists) into a single script string
+    script_text = "\n".join([" # ".join(row) for row in sheet3_data if any(row)])  # Join non-empty rows
+
+    input_script = script_text + """
     Generate the response in only JSON output like:
     ```json
     {1: "prompt1", 2: "prompt2", ..., "nth": "prompt nth"}
     ```
     Strictly no other output should be in the response. Only and only the prompts as a JSON response.
-    Provide me with at least 4 text prompts to generate images related to the script.
+    Provide me one image prompt for each scene between # 
+    if scene(are the one between #) are less that 4 give me at least 4 text prompts to generate images related to the script.
     The pictures should be super vivid, colorful, 3D, and hyper-realistic.
     """
-    print(input_script) # Debugging purposes
+
     response = image_prompt_generation(input_script)
 
     if not response or not isinstance(response, dict):
         print("Invalid response from AI")
         return
 
-    SPREADSHEET_ID = os.getenv("SHEET_ID")
-    SHEET4_NAME = "img_prompt"
+    sheet4 = sh.worksheet("img_prompt")
 
-    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-    service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
-
-    if not service_file_path or not os.path.exists(service_file_path):
-        raise ValueError("Missing or invalid SERVICE_FILE_PATH")
-
-    creds = Credentials.from_service_account_file(service_file_path, scopes=SCOPES)
-    gc = gspread.authorize(creds)
-    sh = gc.open_by_key(SPREADSHEET_ID)
-    sheet4 = sh.worksheet(SHEET4_NAME)
-
-    # Ensure response is a dictionary and append data properly
+    # Store AI-generated prompts in Sheet4
     for key, val in response.items():
-        sheet4.append_row([key, val])  # Append key-value pair for better readability
+        # Ensure `val` is converted to a string and not a list
+        if isinstance(val, list):  
+            val = " | ".join(val)  # Join list items into a single string
+
+        sheet4.append_row([key, val])  # Append key-value pair
 
     print("Google Sheets updated successfully!")
+
+if __name__ == "__main__":
+    image_prompt_generation()
+    print("prompt complete completed.")

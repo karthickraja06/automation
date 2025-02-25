@@ -10,7 +10,7 @@ SHEET3_NAME = "response"
 
 # Authenticate with Google Sheets API
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
+service_file_path = os.getenv("SERVICE_FILE", "secrets/SERVICE_FILE.json")
 
 if not service_file_path or not os.path.exists(service_file_path):
         raise ValueError("Missing or invalid SERVICE_FILE_PATH")
@@ -23,7 +23,7 @@ def update_google_sheets():
     json_response = script_generation()
     description = json_response[0].get("video_description", "")
     script_data = json_response[0].get("script", [])
-        
+
     # Open the spreadsheet
     sh = gc.open_by_key(SPREADSHEET_ID)
     sheet1 = sh.worksheet(SHEET1_NAME)

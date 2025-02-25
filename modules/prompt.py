@@ -21,7 +21,7 @@ VALUE_INPUT_OPTION = "RAW"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # Get the actual service account file path
-SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
+SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_FILE", "secrets/SERVICE_FILE.json")
 
 # Ensure the file exists before using it
 if not os.path.exists(SERVICE_ACCOUNT_FILE):

@@ -4,6 +4,7 @@ import google.generativeai as genai
 import json
 from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv
+import grpc
 
 load_dotenv()
 
@@ -19,7 +20,12 @@ creds = Credentials.from_service_account_file(service_file_path, scopes=SCOPES)
 gc = gspread.authorize(creds)
 sh = gc.open_by_key(SPREADSHEET_ID)
 
-
+def shutdown_grpc():
+    try:
+        grpc._channel._Rendezvous.__del__ = lambda self: None  # Suppress errors
+    except AttributeError:
+        pass
+        
 def fetch_sheet_data(sheet_name):
     """Fetches all rows from a Google Sheet."""
     sheet = sh.worksheet(sheet_name)
@@ -49,8 +55,10 @@ def image_prompt_generation(input_script):
     response = model.generate_content(input_script)
 
     # Ensure response is correctly parsed as JSON
+    shutdown_grpc()
     try:
         script_json = json.loads(response.text)  # Convert response to JSON
+        print(script_json)
         return script_json
     except (json.JSONDecodeError, AttributeError) as e:
         print("Error parsing JSON:", str(e))

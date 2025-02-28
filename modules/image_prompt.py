@@ -58,7 +58,7 @@ def image_prompt_generation(input_script):
     finally:
         del model  # Delete model instance
 
-def image_prompt_generation():
+def image_prompt_organize():
     """Fetches script from Sheet3, generates image prompts, and stores them in Sheet4."""
     sheet3_data = fetch_sheet_data("response")  # Fetch data from 'response' sheet
 
@@ -95,5 +95,5 @@ def image_prompt_generation():
     print("Google Sheets updated successfully!")
 
 if __name__ == "__main__":
-    image_prompt_generation()
+    image_prompt_organize()
     print("prompt complete completed.")

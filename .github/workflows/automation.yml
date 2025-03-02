@@ -31,6 +31,7 @@ jobs:
           echo "TTS_SERVICE_FILE_PATH=$(pwd)/secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
           echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
           echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run Script
         run: python automation.py
@@ -40,6 +41,13 @@ jobs:
         with:
           name: generated-audio-files
           path: audio_outputs/
+          retention-days: 7  # Store artifacts for 7 days
+
+      - name: Upload Audio Files as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-audio-files
+          path: workflow_outputs/**/image_outputs/
           retention-days: 7  # Store artifacts for 7 days
 
       - name: Cleanup Secrets

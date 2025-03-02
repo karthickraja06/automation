@@ -92,6 +92,8 @@ def image_prompt_organize():
 
     sheet4 = sh.worksheet("img_prompt")
 
+    sheet4.clear()  # Clear existing data in Sheet4
+
     # Store AI-generated prompts in Sheet4
     for key, val in response.items():
         # Ensure `val` is converted to a string and not a list

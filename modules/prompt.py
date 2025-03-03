@@ -112,7 +112,7 @@ def sync_google_sheets_data():
     # Update Sheet1 and Sheet2 with modified data
     update_sheet_data(SHEET1_RANGE, [headers1] + rows1)
     update_sheet_data(SHEET2_RANGE, [headers2] + rows2)
-
+    print("Step 1 - Data synchronized successfully!")
     return ",".join(updated_row) if updated_row else ""
 
 # Run the function

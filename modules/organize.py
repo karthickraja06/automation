@@ -49,10 +49,10 @@ def update_google_sheets():
         for entry in script_data:
             sheet3.append_row([entry.get("name", ""), entry.get("gender", ""), entry.get("dialogue", "")])
     
-    print("Google Sheets updated successfully!")
+    print("Step 3 -Google Sheets updated successfully!")
 
 # Run the function
 if __name__ == "__main__":
     update_google_sheets()
-    print("Script completed.")
+    print("Step 1 - 3 completed successfully!")
 

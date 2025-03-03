@@ -88,7 +88,7 @@ def image_generation():
     else:
         print("❌ No images generated.")
 
-    print("🎉 Image Generation Complete!")
+    print("Step 6 - 🎉 Image Generation Complete!")
 
 if __name__ == "__main__":
     image_generation()

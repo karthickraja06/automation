@@ -102,8 +102,8 @@ def image_prompt_organize():
 
         sheet4.append_row([key, val])  # Append key-value pair
 
-    print("Google Sheets updated successfully!")
+    print("Step 5 - Google Sheets updated successfully!")
 
 if __name__ == "__main__":
     image_prompt_organize()
-    print("prompt complete completed.")
+    print(" Step 5 - prompt complete completed.")

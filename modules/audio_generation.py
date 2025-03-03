@@ -100,7 +100,7 @@ def audio_generation():
         filename = os.path.join(audio_output_dir, f"{index:02d}_{name}.mp3")
         generate_speech(dialogue, gender, filename)
 
-    print("All dialogues converted to speech successfully!")
+    print("Step 4 - All dialogues converted to speech successfully!")
 
 if __name__ == "__main__":
     audio_generation()

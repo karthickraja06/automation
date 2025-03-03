@@ -38,6 +38,7 @@ def script_generation():
     # Parse JSON response
     try:
         script_json = json.loads(response.text)  # Convert response to JSON
+        print("Step 2 - Script generated successfully!")
         return(script_json)  # Print JSON output
     except json.JSONDecodeError as e:
         print("Error parsing JSON:", str(e))

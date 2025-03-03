@@ -37,27 +37,19 @@ def image_generation():
         for attempt in range(1, retries + 1):
             try:
                 print(f"🎨 Generating image for: {prompt} (Attempt {attempt})")
-                
-                # Generate image using Hugging Face API
-                image_bytes = client.text_to_image(
+                image = client.text_to_image(
                     prompt,
                     model="black-forest-labs/FLUX.1-dev"
                 )
-
-                # Convert API response to bytes
-                image_buffer = BytesIO(image_bytes)
-
-                # Save image to file
                 filename = os.path.join(directory, f"{file}.png")
-                with open(filename, "wb") as out_file:
-                    out_file.write(image_buffer.getvalue())
-                
+                image.save(filename, format="PNG")  # 🔥 FIX: Convert to PNG format before saving
+
                 print(f"✅ Image saved: {filename}")
                 return filename
 
             except Exception as e:
-                print(f"⚠️ Generation failed. Retrying... ({attempt}/{retries}) - Error: {e}")
-                time.sleep(10)
+                print(f"⚠️ Generation failed. Retrying... ({attempt}/{retries})")
+                time.sleep(10)  # Wait before retrying
 
         print(f"❌ Skipping prompt: {prompt} (Image generation failed)")
         return None

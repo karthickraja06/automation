@@ -40,17 +40,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-audio-files
-          path: |
-              audio_outputs/
-              image_outputs/
+          path: workflow_outputs/
           retention-days: 7  # Store artifacts for 7 days
-
-      #- name: Upload Audio Files as Artifacts
-       # uses: actions/upload-artifact@v4
-        #with:
-         # name: generated-audio-files
-          #path: workflow_outputs/**/image_outputs/
-          #retention-days: 7  # Store artifacts for 7 days
 
       - name: Cleanup Secrets
         run: rm -rf secrets

@@ -51,7 +51,8 @@ def image_prompt_generation(input_script):
 
 def image_prompt_organize(sh):
     """Fetches script from Sheet3, generates image prompts, and stores them in Sheet4."""
-    sheet3_data = sh.get_all_values()  # Fetch data from 'response' sheet
+    sheet3 = sh.worksheet("img_prompt")  # Access 'script' sheet
+    sheet3_data = sheet3.get_all_values()  # Fetch data from 'response' sheet
 
     # Convert sheet data (list of lists) into a single script string
     script_text = "\n".join([" # ".join(row) for row in sheet3_data if any(row)])  # Join non-empty rows

@@ -121,8 +121,9 @@ def video_generation(sh):
     sheet = sh.worksheet("accounts")
     accounts = sheet.get_all_records()  # Read all accounts from the sheet
 
-    INPUT_FOLDER = "output/image_outputs"  # Change this to the actual path
-    OUTPUT_FOLDER = "output/video_outputs"  # Change this to the actual path
+    output_root = os.path.join(os.getcwd(), "workflow_outputs")
+    INPUT_FOLDER = os.path.join(output_root, "image_outputs")  # Change this to the actual path
+    OUTPUT_FOLDER = os.path.join(output_root, "video_outputs")  # Change this to the actual path
 
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 

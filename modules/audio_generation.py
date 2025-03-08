@@ -20,42 +20,19 @@ def audio_generation(sheet):
 
     # Load Sheets
     RESPONSE_SHEET = "response"
-    TOPICS_SHEET = "topics"
 
     try:
         response_sheet = sheet.worksheet(RESPONSE_SHEET)
-        topics_sheet = sheet.worksheet(TOPICS_SHEET)
 
         rows = response_sheet.get_all_values()[1:]  # Fetch all values excluding headers
-
-        # Find the folder name from 'topics' sheet
-        topics_data = topics_sheet.get_all_values()
-        headers = topics_data[0]
-        last_used_index = headers.index("last used")
-        genre_index = headers.index("genre")
-
-        folder_name = None
-        for row in topics_data[1:]:
-            if row[last_used_index].strip().lower() == "this":
-                folder_name = row[genre_index].strip()
-                break
-
-        # Default folder name if no match is found
-        if not folder_name:
-            folder_name = "Uncategorized"
 
     except Exception as e:
         print(f"Error accessing Google Sheets: {e}")
         exit(1)
 
-    # Get the current date (DD-MM-YYYY format)
-    current_date = datetime.now().strftime("%d-%m-%Y")
-
     # Define output directories for GitHub Artifacts
     output_root = os.path.join(os.getcwd(), "workflow_outputs")
-    genre_folder = os.path.join(output_root, folder_name)
-    date_folder = os.path.join(genre_folder, current_date)
-    audio_output_dir = os.path.join(date_folder, "audio_outputs")
+    audio_output_dir = os.path.join(output_root, "audio_outputs")
 
     # Create necessary directories
     os.makedirs(audio_output_dir, exist_ok=True)

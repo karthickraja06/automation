@@ -2,7 +2,6 @@ import os
 import time
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
-from datetime import datetime
 
 def image_generation(sh):
     # Load API Key from .env
@@ -45,34 +44,9 @@ def image_generation(sh):
         print(f"❌ Skipping prompt: {prompt} (Image generation failed)")
         return None
 
-    # Get current date for organizing output folders
-    current_date = datetime.now().strftime("%d-%m-%Y")
-
-    # Fetch the folder name from the 'topics' sheet
-    TOPICS_SHEET = "topics"
-    try:
-        topics_sheet = sh.worksheet(TOPICS_SHEET)
-        topics_data = topics_sheet.get_all_values()
-        headers = topics_data[0]
-        last_used_index = headers.index("last used")
-        genre_index = headers.index("genre")
-
-        folder_name = None
-        for row in topics_data[1:]:
-            if row[last_used_index].strip().lower() == "this":
-                folder_name = row[genre_index].strip()
-                break
-
-        folder_name = folder_name if folder_name else "Uncategorized"
-    except Exception as e:
-        print(f"⚠️ Error accessing Google Sheets: {e}")
-        exit(1)
-
     # Define output directories for GitHub Artifacts
     output_root = os.path.join(os.getcwd(), "workflow_outputs")
-    genre_folder = os.path.join(output_root, folder_name)
-    date_folder = os.path.join(genre_folder, current_date)
-    image_output_dir = os.path.join(date_folder, "image_outputs")
+    image_output_dir = os.path.join(output_root, "image_outputs")
 
     # Create necessary directories
     os.makedirs(image_output_dir, exist_ok=True)

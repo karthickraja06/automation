@@ -1,13 +1,10 @@
 import os
 import time
-import gspread
-from io import BytesIO
-from google.oauth2.service_account import Credentials
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 from datetime import datetime
 
-def image_generation():
+def image_generation(sh):
     # Load API Key from .env
     load_dotenv()
     HUGGINGFACE_API_KEY = os.getenv("HF_TOKEN")
@@ -17,16 +14,10 @@ def image_generation():
         provider="hf-inference",
         api_key=HUGGINGFACE_API_KEY
     )
-
-    # Google Sheet Credentials
-    SHEET_ID = os.getenv("SHEET_ID")
+    
     SHEET_NAME = "img_prompt"
-    service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
 
-    scope = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds = Credentials.from_service_account_file(service_file_path, scopes=scope)
-    client_gsheet = gspread.authorize(creds)
-    sheet = client_gsheet.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
+    sheet = sh.worksheet(SHEET_NAME)
 
     # Fetch prompts from Google Sheet
     prompts = sheet.get_all_values()
@@ -60,7 +51,7 @@ def image_generation():
     # Fetch the folder name from the 'topics' sheet
     TOPICS_SHEET = "topics"
     try:
-        topics_sheet = client_gsheet.open_by_key(SHEET_ID).worksheet(TOPICS_SHEET)
+        topics_sheet = sh.worksheet(TOPICS_SHEET)
         topics_data = topics_sheet.get_all_values()
         headers = topics_data[0]
         last_used_index = headers.index("last used")

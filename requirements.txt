@@ -15,4 +15,5 @@ google-generativeai
 google-cloud-texttospeech
 huggingface_hub  
 Pillow
-
+selenium 
+webdriver-manager

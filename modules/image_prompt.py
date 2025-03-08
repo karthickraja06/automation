@@ -8,28 +8,11 @@ import grpc
 
 load_dotenv()
 
-service_file_path = os.getenv("SERVICE_FILE", "secrets/SERVICE_FILE.json")
-SPREADSHEET_ID = os.getenv("SHEET_ID")
-
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
-if not service_file_path or not os.path.exists(service_file_path):
-    raise ValueError("Missing or invalid SERVICE_FILE_PATH")
-
-creds = Credentials.from_service_account_file(service_file_path, scopes=SCOPES)
-gc = gspread.authorize(creds)
-sh = gc.open_by_key(SPREADSHEET_ID)
-
 def shutdown_grpc():
     try:
         grpc._channel._Rendezvous.__del__ = lambda self: None  # Suppress errors
     except AttributeError:
         pass
-        
-def fetch_sheet_data(sheet_name):
-    """Fetches all rows from a Google Sheet."""
-    sheet = sh.worksheet(sheet_name)
-    return sheet.get_all_values()  # Returns a list of lists (each row as a list)
 
 def image_prompt_generation(input_script):
     """Generates image prompts using Gemini AI."""
@@ -66,9 +49,9 @@ def image_prompt_generation(input_script):
     finally:
         del model  # Delete model instance
 
-def image_prompt_organize():
+def image_prompt_organize(sh):
     """Fetches script from Sheet3, generates image prompts, and stores them in Sheet4."""
-    sheet3_data = fetch_sheet_data("response")  # Fetch data from 'response' sheet
+    sheet3_data = sh.get_all_values()  # Fetch data from 'response' sheet
 
     # Convert sheet data (list of lists) into a single script string
     script_text = "\n".join([" # ".join(row) for row in sheet3_data if any(row)])  # Join non-empty rows

@@ -1,43 +1,28 @@
 import os
-import gspread
 from google.oauth2.service_account import Credentials
 from google.cloud import texttospeech
 from dotenv import load_dotenv
 from datetime import datetime
 
-def audio_generation():
+def audio_generation(sheet):
     # Load environment variables
     load_dotenv()
 
     # Define API Scopes
-    SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
     TTS_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
     # Get service file paths from environment variables
-    service_file_path = os.getenv("SERVICE_FILE_PATH", "secrets/SERVICE_FILE.json")
     tts_service_file_path = os.getenv("TTS_SERVICE_FILE_PATH", "secrets/TTS_SERVICE_FILE.json")
-
-    if not service_file_path or not os.path.exists(service_file_path):
-        raise ValueError("Missing or invalid SERVICE_FILE_PATH")
-
-    if not tts_service_file_path or not os.path.exists(tts_service_file_path):
-        raise ValueError("Missing or invalid TTS_SERVICE_FILE_PATH")
-
-    # Authenticate Google Sheets
-    sheets_creds = Credentials.from_service_account_file(service_file_path, scopes=SHEETS_SCOPES)
-    sheets_client = gspread.authorize(sheets_creds)
 
     # Authenticate Google Text-to-Speech
     tts_creds = Credentials.from_service_account_file(tts_service_file_path, scopes=TTS_SCOPES)
     tts_client = texttospeech.TextToSpeechClient(credentials=tts_creds)
 
     # Load Sheets
-    SHEET_ID = os.getenv("SHEET_ID")
     RESPONSE_SHEET = "response"
     TOPICS_SHEET = "topics"
 
     try:
-        sheet = sheets_client.open_by_key(SHEET_ID)
         response_sheet = sheet.worksheet(RESPONSE_SHEET)
         topics_sheet = sheet.worksheet(TOPICS_SHEET)
 

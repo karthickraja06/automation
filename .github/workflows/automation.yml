@@ -1,47 +1,47 @@
-name: Daily Automation
+# name: Daily Automation
 
-on:
-  schedule:
-    - cron: "0 6 * * *"  # Runs daily at 6 AM UTC
-  workflow_dispatch:  # Allows manual trigger
+# on:
+#   schedule:
+#     - cron: "0 6 * * *"  # Runs daily at 6 AM UTC
+#   workflow_dispatch:  # Allows manual trigger
 
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
+# jobs:
+#   run-script:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
 
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+#       - name: Set Up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: "3.11"
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+#       - name: Install Dependencies
+#         run: pip install -r requirements.txt
 
-      - name: Decode and Store Service Account Files
-        run: |
-          mkdir -p secrets
-          echo "${{ secrets.SERVICE_FILE }}" | base64 --decode > secrets/SERVICE_FILE.json
-          echo "${{ secrets.TTS_SERVICE_FILE }}" | base64 --decode > secrets/TTS_SERVICE_FILE.json
+#       - name: Decode and Store Service Account Files
+#         run: |
+#           mkdir -p secrets
+#           echo "${{ secrets.SERVICE_FILE }}" | base64 --decode > secrets/SERVICE_FILE.json
+#           echo "${{ secrets.TTS_SERVICE_FILE }}" | base64 --decode > secrets/TTS_SERVICE_FILE.json
           
-          echo "SERVICE_FILE_PATH=$(pwd)/secrets/SERVICE_FILE.json" >> $GITHUB_ENV
-          echo "TTS_SERVICE_FILE_PATH=$(pwd)/secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
-          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
-          echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
-          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
+#           echo "SERVICE_FILE_PATH=$(pwd)/secrets/SERVICE_FILE.json" >> $GITHUB_ENV
+#           echo "TTS_SERVICE_FILE_PATH=$(pwd)/secrets/TTS_SERVICE_FILE.json" >> $GITHUB_ENV
+#           echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
+#           echo "GEMINI_API=${{ secrets.GEMINI_API }}" >> $GITHUB_ENV
+#           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Run Script
-        run: python automation.py
+#       - name: Run Script
+#         run: python automation.py
 
-      - name: Upload Audio Files as Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-audio-files
-          path: workflow_outputs/
-          retention-days: 7  # Store artifacts for 7 days
+#       - name: Upload Audio Files as Artifacts
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: generated-audio-files
+#           path: workflow_outputs/
+#           retention-days: 7  # Store artifacts for 7 days
 
-      - name: Cleanup Secrets
-        run: rm -rf secrets
+#       - name: Cleanup Secrets
+#         run: rm -rf secrets

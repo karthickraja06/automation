@@ -1,64 +1,103 @@
 import os
 import time
-from huggingface_hub import InferenceClient
+import requests
 from dotenv import load_dotenv
+from datetime import datetime
 
 def image_generation(sh):
-    # Load API Key from .env
+    # Load environment variables
     load_dotenv()
-    HUGGINGFACE_API_KEY = os.getenv("HF_TOKEN")
-
-    # Initialize Hugging Face Inference Client
-    client = InferenceClient(
-        provider="hf-inference",
-        api_key=HUGGINGFACE_API_KEY
-    )
     
-    SHEET_NAME = "img_prompt"
+    # Get API token
+    HF_TOKEN = os.getenv("HF_TOKEN")
+    if not HF_TOKEN:
+        raise ValueError("HF_TOKEN not found in environment variables")
 
-    sheet = sh.worksheet(SHEET_NAME)
+    # API configuration
+    API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+        "Content-Type": "application/json"
+    }
 
-    # Fetch prompts from Google Sheet
-    prompts = sheet.get_all_values()
-    print(prompts)  # Debugging
+    def generate_image(prompt, output_path, index):
+        """Generate a single image from a prompt"""
+        try:
+            print(f"🎨 Generating image {index}: {prompt}")
+            
+            payload = {
+                "inputs": prompt,
+                "parameters": {
+                    "width": 1024,
+                    "height": 1024,
+                    "num_inference_steps": 50,
+                    "guidance_scale": 7.5
+                }
+            }
 
-    # Function to generate an image using Stable Diffusion 3.5
-    def generate_image(prompt, directory, file, retries=4):
-        for attempt in range(1, retries + 1):
-            try:
-                print(f"🎨 Generating image for: {prompt} (Attempt {attempt})")
-                image = client.text_to_image(
-                    prompt,
-                    model="stabilityai/stable-diffusion-2-1"
-                )
-                filename = os.path.join(directory, f"{file}.png")
-                image.save(filename, format="PNG")  # 🔥 FIX: Convert to PNG format before saving
+            # Make API request
+            response = requests.post(API_URL, headers=headers, json=payload)
+            response.raise_for_status()
 
-                print(f"✅ Image saved: {filename}")
-                return filename
+            # Save the image
+            image_path = os.path.join(output_path, f"image_{index:02d}.png")
+            with open(image_path, "wb") as f:
+                f.write(response.content)
+            
+            print(f"✅ Saved image: {image_path}")
+            return image_path
 
-            except Exception as e:
-                print(f"⚠️ Generation failed. Retrying... ({attempt}/{retries})")
-                time.sleep(10)  # Wait before retrying
+        except Exception as e:
+            print(f"❌ Error generating image {index}: {str(e)}")
+            return None
 
-        print(f"❌ Skipping prompt: {prompt} (Image generation failed)")
-        return None
+    try:
+        # Get prompts from sheet
+        worksheet = sh.worksheet("img_prompt")
+        rows = worksheet.get_all_values()[1:]  # Skip header row
+        
+        # Setup output directory
+        current_date = datetime.now().strftime("%d-%m-%Y")
+        output_dir = os.path.join(os.getcwd(), "workflow_outputs", "images", current_date)
+        os.makedirs(output_dir, exist_ok=True)
 
-    # Define output directories for GitHub Artifacts
-    output_root = os.path.join(os.getcwd(), "workflow_outputs")
-    image_output_dir = os.path.join(output_root, "image_outputs")
+        # Generate images
+        generated_files = []
+        for i, row in enumerate(rows, 1):
+            if len(row) < 2:  # Skip invalid rows
+                continue
+                
+            prompt = row[1]
+            # Add retry logic
+            for attempt in range(3):
+                result = generate_image(prompt, output_dir, i)
+                if result:
+                    generated_files.append(result)
+                    break
+                print(f"Retrying... (Attempt {attempt + 1}/3)")
+                time.sleep(5)
 
-    # Create necessary directories
-    os.makedirs(image_output_dir, exist_ok=True)
+        print(f"🎉 Generated {len(generated_files)} images")
+        return generated_files
 
-    # Process all prompts
-    for prompt in prompts:
-        if len(prompt) < 2:
-            print(f"⚠️ Skipping invalid prompt row: {prompt}")
-            continue
-        generate_image(prompt[1], image_output_dir, prompt[0])
-
-    print("🎉 Image Generation Complete! Images saved in workflow_outputs.")
+    except Exception as e:
+        print(f"❌ Error in image generation process: {str(e)}")
+        return []
 
 if __name__ == "__main__":
-    image_generation()
+    # For testing the module directly
+    from google.oauth2.service_account import Credentials
+    import gspread
+    
+    load_dotenv()
+    SHEET_ID = os.getenv("SHEET_ID")
+    service_file_path = os.getenv("SERVICE_FILE")
+    
+    creds = Credentials.from_service_account_file(
+        service_file_path, 
+        scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    )
+    gc = gspread.authorize(creds)
+    sh = gc.open_by_key(SHEET_ID)
+    
+    image_generation(sh)

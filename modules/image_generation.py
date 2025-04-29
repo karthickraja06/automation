@@ -58,7 +58,7 @@ def image_generation(sh):
         
         # Setup output directory
         current_date = datetime.now().strftime("%d-%m-%Y")
-        output_dir = os.path.join(os.getcwd(), "workflow_outputs", "images", current_date)
+        output_dir = os.path.join(os.getcwd(), "workflow_outputs", "image_outputs", current_date)
         os.makedirs(output_dir, exist_ok=True)
 
         # Generate images

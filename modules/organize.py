@@ -7,7 +7,8 @@ SHEET3_NAME = "response"
 def update_google_sheets(sh):
     # Step 1: Generate script data
     json_response = script_generation()
-    description = json_response[0].get("video_description", "")
+    print(json_response)
+    description = json_response[0].get("description", "")
     script_data = json_response[0].get("script", [])
 
     # Open the spreadsheet

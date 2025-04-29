@@ -29,7 +29,7 @@ def image_generation(sh):
                 print(f"🎨 Generating image for: {prompt} (Attempt {attempt})")
                 image = client.text_to_image(
                     prompt,
-                    model="black-forest-labs/FLUX.1-dev"
+                    model="stabilityai/stable-diffusion-2-1"
                 )
                 filename = os.path.join(directory, f"{file}.png")
                 image.save(filename, format="PNG")  # 🔥 FIX: Convert to PNG format before saving

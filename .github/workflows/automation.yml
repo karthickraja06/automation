@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-audio-files
-          path: workflow_outputs/
+          path: workflow_outputs/**/*
           retention-days: 7  # Store artifacts for 7 days
 
       - name: Cleanup Secrets
